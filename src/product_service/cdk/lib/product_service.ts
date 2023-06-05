@@ -29,6 +29,19 @@ export class ProductService extends Construct {
             }
         );
 
+        const getProductsByIdHandler = new NodejsFunction(
+            this,
+            'GetProductsByIdLambda',
+            {
+                ...sharedLambdaProps,
+                functionName: 'getProductsById',
+                entry: path.resolve(
+                    __dirname,
+                    'handlers/get_products_by_id.ts'
+                ),
+            }
+        );
+
         const api = new apiGateway.HttpApi(this, 'products-api', {
             corsPreflight: {
                 allowHeaders: ['*'],
@@ -42,6 +55,14 @@ export class ProductService extends Construct {
                 getProductsListHandler
             ),
             path: '/products',
+            methods: [apiGateway.HttpMethod.GET],
+        });
+        api.addRoutes({
+            integration: new HttpLambdaIntegration(
+                'GetProductsByIdIntegration',
+                getProductsByIdHandler
+            ),
+            path: '/products/{productId}',
             methods: [apiGateway.HttpMethod.GET],
         });
     }
