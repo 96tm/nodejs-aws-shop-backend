@@ -1,4 +1,4 @@
-import { handler as getProductsList } from '../src/product_service/cdk/lib/handlers/get_products_list';
+import { handler as getProductsList } from '../src/product_service/cdk/lib/handlers/get_products_list_dynamo';
 
 test('List route should return array', async () => {
     const response = await getProductsList({});

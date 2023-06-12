@@ -3,25 +3,19 @@ import {
   GetItemCommand,
   GetItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
-import {
-  APIGatewayEvent,
-  APIGatewayProxyEventPathParameters,
-} from 'aws-lambda';
+
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
-import { ProductItemDynamoDb } from '../models/product_item_dynamodb';
-import { StockItemDynamoDb } from '../models/stock_item_dynamodb';
-import { ProductWithStock } from '../models/product_with_stock';
+import { LambdaEventDetail } from '../types';
+import { ProductItemDynamoDb } from '../../models/product_item_dynamodb';
+import { StockItemDynamoDb } from '../../models/stock_item_dynamodb';
+import { ProductWithStock } from '../../models/product_with_stock';
 import {
   buildResponse,
   AppResponse,
   ErrorData,
   buildServerErrorResponse,
-} from '../../../../utils/utils';
-
-interface LambdaEventDetail extends APIGatewayEvent {
-  pathParameters: APIGatewayProxyEventPathParameters & { productId: string };
-}
+} from '../../../../../utils/utils';
 
 interface StocksGetItemCommandOutput extends GetItemCommandOutput {
   Item?: StockItemDynamoDb;

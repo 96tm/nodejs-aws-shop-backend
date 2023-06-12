@@ -1,81 +1,81 @@
 {
-   "openapi":"3.0.3",
-   "info":{
-      "title":"RSSchool AWS Developer Course - OpenAPI 3.0",
-      "description":"This an OpenAPI 3.0 specification for API developed for the [course](https://github.com/rolling-scopes-school/aws/tree/main/aws-developer)",
-      "termsOfService":"http://swagger.io/terms/",
-      "license":{
-         "name":"Apache 2.0",
-         "url":"http://www.apache.org/licenses/LICENSE-2.0.html"
+   "openapi": "3.0.3",
+   "info": {
+      "title": "RSSchool AWS Developer Course - OpenAPI 3.0",
+      "description": "This an OpenAPI 3.0 specification for API developed for the [course](https://github.com/rolling-scopes-school/aws/tree/main/aws-developer)",
+      "termsOfService": "http://swagger.io/terms/",
+      "license": {
+         "name": "Apache 2.0",
+         "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
       },
-      "version":"1.0.11"
+      "version": "1.0.11"
    },
-   "externalDocs":{
-      "description":"Find out more about Swagger",
-      "url":"http://swagger.io"
+   "externalDocs": {
+      "description": "Find out more about Swagger",
+      "url": "http://swagger.io"
    },
-   "servers":[
+   "servers": [
       {
-         "url":"https://mudsr7c4lg.execute-api.eu-north-1.amazonaws.com"
+         "url": "https://3qcwnhqj6a.execute-api.eu-north-1.amazonaws.com"
       }
    ],
-   "tags":[
+   "tags": [
       {
-         "name":"products",
-         "description":"Products API"
+         "name": "products",
+         "description": "Products API"
       }
    ],
-   "paths":{
-      "/products":{
-         "post":{
-            "tags":[
+   "paths": {
+      "/products": {
+         "post": {
+            "tags": [
                "products"
             ],
-            "summary":"Add a new product to the store",
-            "description":"Add a new pet to the store",
-            "requestBody":{
-               "description":"Create a new product in the store",
-               "content":{
-                  "application/json":{
-                     "schema":{
-                        "$ref":"#/components/schemas/CreateProduct"
+            "summary": "Add a new product to the store",
+            "description": "Add a new pet to the store",
+            "requestBody": {
+               "description": "Create a new product in the store",
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "$ref": "#/components/schemas/CreateProduct"
                      }
                   }
                },
-               "required":true
+               "required": true
             },
-            "responses":{
-               "201":{
-                  "description":"Successful operation",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Product"
+            "responses": {
+               "201": {
+                  "description": "Successful operation",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Product"
                         }
                      }
                   }
                },
-               "400":{
-                  "description":"Invalid input"
+               "400": {
+                  "description": "Invalid input"
                }
             }
          },
-         "get":{
-            "tags":[
+         "get": {
+            "tags": [
                "products"
             ],
-            "summary":"Get products",
-            "description":"Get all products as JSON array",
-            "operationId":"getProductsList",
-            "responses":{
-               "200":{
-                  "description":"successful operation",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "type":"array",
-                           "items":{
-                              "$ref":"#/components/schemas/Product"
+            "summary": "Get products",
+            "description": "Get all products as JSON array",
+            "operationId": "getProductsList",
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "type": "array",
+                           "items": {
+                              "$ref": "#/components/schemas/Product"
                            }
                         }
                      }
@@ -84,104 +84,104 @@
             }
          }
       },
-      "/products/{productId}":{
-         "get":{
-            "tags":[
+      "/products/{productId}": {
+         "get": {
+            "tags": [
                "products"
             ],
-            "summary":"Find product by ID",
-            "description":"Returns a product",
-            "operationId":"getProductsById",
-            "parameters":[
+            "summary": "Find product by ID",
+            "description": "Returns a product",
+            "operationId": "getProductsById",
+            "parameters": [
                {
-                  "name":"productId",
-                  "in":"path",
-                  "description":"ID of product to return",
-                  "required":true,
-                  "schema":{
-                     "type":"string",
-                     "format":"uuid"
+                  "name": "productId",
+                  "in": "path",
+                  "description": "ID of product to return",
+                  "required": true,
+                  "schema": {
+                     "type": "string",
+                     "format": "uuid"
                   }
                }
             ],
-            "responses":{
-               "200":{
-                  "description":"successful operation",
-                  "content":{
-                     "application/json":{
-                        "schema":{
-                           "$ref":"#/components/schemas/Product"
+            "responses": {
+               "200": {
+                  "description": "successful operation",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "$ref": "#/components/schemas/Product"
                         }
                      }
                   }
                },
-               "404":{
-                  "description":"Product not found"
+               "404": {
+                  "description": "Product not found"
                }
             }
          }
       }
    },
-   "components":{
-      "schemas":{
-         "Product":{
-            "type":"object",
-            "properties":{
-               "id":{
-                  "title":"Product ID",
-                  "description":"Product ID (uuid)",
-                  "type":"string",
-                  "format":"uuid",
-                  "example":"7a70ce95-6d7a-475c-874d-65142ea80791"
+   "components": {
+      "schemas": {
+         "Product": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "title": "Product ID",
+                  "description": "Product ID (uuid)",
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "7a70ce95-6d7a-475c-874d-65142ea80791"
                },
-               "count":{
-                  "title":"Count",
-                  "description":"Available product stock",
-                  "type":"number",
-                  "example":5
+               "count": {
+                  "title": "Count",
+                  "description": "Available product stock",
+                  "type": "number",
+                  "example": 5
                },
-               "price":{
-                  "title":"Price",
-                  "description":"Product price",
-                  "type":"number",
-                  "example":150
+               "price": {
+                  "title": "Price",
+                  "description": "Product price",
+                  "type": "number",
+                  "example": 150
                },
-               "title":{
-                  "title":"Title",
-                  "description":"Product title",
-                  "type":"string"
+               "title": {
+                  "title": "Title",
+                  "description": "Product title",
+                  "type": "string"
                },
-               "description":{
-                  "title":"Description",
-                  "description":"Product description",
-                  "type":"string"
+               "description": {
+                  "title": "Description",
+                  "description": "Product description",
+                  "type": "string"
                }
             }
          },
-         "CreateProduct":{
-            "type":"object",
-            "properties":{
-               "count":{
-                  "title":"Count",
-                  "description":"Available product stock",
-                  "type":"number",
-                  "example":5
+         "CreateProduct": {
+            "type": "object",
+            "properties": {
+               "count": {
+                  "title": "Count",
+                  "description": "Available product stock",
+                  "type": "number",
+                  "example": 5
                },
-               "price":{
-                  "title":"Price",
-                  "description":"Product price",
-                  "type":"number",
-                  "example":150
+               "price": {
+                  "title": "Price",
+                  "description": "Product price",
+                  "type": "number",
+                  "example": 150
                },
-               "title":{
-                  "title":"Title",
-                  "description":"Product title",
-                  "type":"string"
+               "title": {
+                  "title": "Title",
+                  "description": "Product title",
+                  "type": "string"
                },
-               "description":{
-                  "title":"Description",
-                  "description":"Product description",
-                  "type":"string"
+               "description": {
+                  "title": "Description",
+                  "description": "Product description",
+                  "type": "string"
                }
             }
          }

@@ -1,16 +1,16 @@
-import path from 'path';
-import * as apiGateway from '@aws-cdk/aws-apigatewayv2-alpha';
-import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as iam from 'aws-cdk-lib/aws-iam';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import * as cdk from 'aws-cdk-lib';
+
+import { NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Construct } from 'constructs';
+import { ProductServiceProps } from './models/product_service_props';
+
+import { initDynamoApi } from './init_dynamo_api';
 
 import {
-  NodejsFunction,
-  NodejsFunctionProps,
-} from 'aws-cdk-lib/aws-lambda-nodejs';
-import { Construct } from 'constructs';
+  PRODUCTS_TABLE_NAME,
+  STOCKS_TABLE_NAME,
+} from '../../../utils/constants';
+import { initRdsApi } from './init_rds_api';
 
 export const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   runtime: lambda.Runtime.NODEJS_18_X,
@@ -19,16 +19,11 @@ export const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   },
 };
 
-interface ProductServiceProps extends cdk.StackProps {
-  productsTable: dynamodb.Table;
-  stocksTable: dynamodb.Table;
-}
-
 export class ProductService extends Construct {
   constructor(scope: Construct, id: string, props: ProductServiceProps) {
     super(scope, id);
 
-    const lambdaProps = {
+    const lambdaPropsDynamo = {
       ...sharedLambdaProps,
       environment: {
         ...sharedLambdaProps.environment,
@@ -37,88 +32,36 @@ export class ProductService extends Construct {
       },
     };
 
-    const getProductsListHandler = new NodejsFunction(
-      this,
-      'GetProductsListLambda',
-      {
-        ...lambdaProps,
-        functionName: 'getProductsList',
-        entry: path.resolve(__dirname, 'handlers/get_products_list.ts'),
-      }
-    );
-
-    const getProductsByIdHandler = new NodejsFunction(
-      this,
-      'GetProductsByIdLambda',
-      {
-        ...lambdaProps,
-        functionName: 'getProductsById',
-        entry: path.resolve(__dirname, 'handlers/get_products_by_id.ts'),
-      }
-    );
-
-    const createProductHandler = new NodejsFunction(
-      this,
-      'CreateProductLambda',
-      {
-        ...lambdaProps,
-        functionName: 'createProduct',
-        entry: path.resolve(__dirname, 'handlers/create_product.ts'),
-      }
-    );
-
-    const api = new apiGateway.HttpApi(this, 'products-api', {
-      corsPreflight: {
-        allowHeaders: ['*'],
-        allowOrigins: ['*'],
-        allowMethods: [apiGateway.CorsHttpMethod.ANY],
+    const lambdaPropsRds = {
+      ...sharedLambdaProps,
+      securityGroups: props.rdsSecurityGroups,
+      vpc: props.rdsVpc,
+      allowPublicSubnet: true,
+      environment: {
+        ...sharedLambdaProps.environment,
+        POSTGRES_HOST: props.rdsInstance.dbInstanceEndpointAddress,
+        POSTGRES_USER: process.env.POSTGRES_USER,
+        POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+        POSTGRES_NAME: process.env.POSTGRES_NAME,
+        POSTGRES_PORT: process.env.POSTGRES_PORT,
+        APP_PRODUCTS_TABLE_NAME: PRODUCTS_TABLE_NAME,
+        APP_STOCKS_TABLE_NAME: STOCKS_TABLE_NAME,
       },
-    });
-    api.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'GetProductsListIntegration',
-        getProductsListHandler
-      ),
-      path: '/products',
-      methods: [apiGateway.HttpMethod.GET],
-    });
-    api.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'GetProductsByIdIntegration',
-        getProductsByIdHandler
-      ),
-      path: '/products/{productId}',
-      methods: [apiGateway.HttpMethod.GET],
-    });
-    api.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'CreateProductIntegration',
-        createProductHandler
-      ),
-      path: '/products',
-      methods: [apiGateway.HttpMethod.POST],
+      bundling: {
+        externalModules: ['aws-sdk', 'pg-native'],
+      },
+    };
+
+    initDynamoApi({
+      lambdaProps: lambdaPropsDynamo,
+      construct: this,
+      props: props,
     });
 
-    getProductsListHandler.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['dynamodb:Scan'],
-        resources: [props.productsTable.tableArn, props.stocksTable.tableArn],
-      })
-    );
-    getProductsByIdHandler.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['dynamodb:GetItem'],
-        resources: [props.productsTable.tableArn, props.stocksTable.tableArn],
-      })
-    );
-    createProductHandler.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['dynamodb:PutItem'],
-        resources: [props.productsTable.tableArn, props.stocksTable.tableArn],
-      })
-    );
+    initRdsApi({
+      lambdaProps: lambdaPropsRds,
+      construct: this,
+      props: props,
+    });
   }
 }

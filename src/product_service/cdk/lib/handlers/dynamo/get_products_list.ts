@@ -6,14 +6,14 @@ import {
   ScanCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 
-import { Stock } from '../models/stock';
-import { ProductWithStock } from '../models/product_with_stock';
+import { Stock } from '../../models/stock';
+import { ProductWithStock } from '../../models/product_with_stock';
 import {
   buildResponse,
   AppResponse,
   buildServerErrorResponse,
-} from '../../../../utils/utils';
-import { Product } from '../models/product';
+} from '../../../../../utils/utils';
+import { Product } from '../../models/product';
 
 interface ProductsScanCommandOutput extends ScanCommandOutput {
   Items?: Product[] | undefined;

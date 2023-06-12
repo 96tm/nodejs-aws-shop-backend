@@ -1,4 +1,4 @@
-import { handler as getProductsById } from '../src/product_service/cdk/lib/handlers/get_products_by_id';
+import { handler as getProductsById } from '../src/product_service/cdk/lib/handlers/get_products_by_id_dynamo';
 import { mockProducts } from '../src/product_service/cdk/lib/mocks/products';
 
 test('Product detail route should return Product object', async () => {
