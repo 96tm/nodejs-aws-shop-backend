@@ -57,6 +57,16 @@ export class ProductService extends Construct {
       }
     );
 
+    const createProductHandler = new NodejsFunction(
+      this,
+      'CreateProductLambda',
+      {
+        ...lambdaProps,
+        functionName: 'createProduct',
+        entry: path.resolve(__dirname, 'handlers/create_product.ts'),
+      }
+    );
+
     const api = new apiGateway.HttpApi(this, 'products-api', {
       corsPreflight: {
         allowHeaders: ['*'],
@@ -80,6 +90,14 @@ export class ProductService extends Construct {
       path: '/products/{productId}',
       methods: [apiGateway.HttpMethod.GET],
     });
+    api.addRoutes({
+      integration: new HttpLambdaIntegration(
+        'CreateProductIntegration',
+        createProductHandler
+      ),
+      path: '/products',
+      methods: [apiGateway.HttpMethod.POST],
+    });
 
     getProductsListHandler.addToRolePolicy(
       new iam.PolicyStatement({
@@ -92,6 +110,13 @@ export class ProductService extends Construct {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: ['dynamodb:GetItem'],
+        resources: [props.productsTable.tableArn, props.stocksTable.tableArn],
+      })
+    );
+    createProductHandler.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['dynamodb:PutItem'],
         resources: [props.productsTable.tableArn, props.stocksTable.tableArn],
       })
     );

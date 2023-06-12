@@ -1,8 +1,5 @@
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-
-import * as productService from './product_service';
 
 import '../../../utils/load_env';
 

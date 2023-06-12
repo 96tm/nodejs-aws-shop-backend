@@ -3,17 +3,24 @@ import {
   GetItemCommand,
   GetItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
-import { buildResponse, AppResponse } from '../../../../utils/utils';
-import { ErrorResponse } from '../models/response';
-
+import {
+  APIGatewayEvent,
+  APIGatewayProxyEventPathParameters,
+} from 'aws-lambda';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+
 import { ProductItemDynamoDb } from '../models/product_item_dynamodb';
 import { StockItemDynamoDb } from '../models/stock_item_dynamodb';
 import { ProductWithStock } from '../models/product_with_stock';
+import {
+  buildResponse,
+  AppResponse,
+  ErrorData,
+  buildServerErrorResponse,
+} from '../../../../utils/utils';
 
-interface LambdaEventDetail {
-  queryStringParameters?: Record<string, string>;
-  pathParameters: Record<string, string>;
+interface LambdaEventDetail extends APIGatewayEvent {
+  pathParameters: APIGatewayProxyEventPathParameters & { productId: string };
 }
 
 interface StocksGetItemCommandOutput extends GetItemCommandOutput {
@@ -62,7 +69,7 @@ export async function handler(event: LambdaEventDetail): Promise<AppResponse> {
     let { Item: productItem } =
       productsResult as unknown as ProductsGetItemCommandOutput;
     if (!productItem) {
-      return buildResponse<ErrorResponse>(404, {
+      return buildResponse<ErrorData>(404, {
         error: {
           detail: 'Product not found',
         },
@@ -83,8 +90,6 @@ export async function handler(event: LambdaEventDetail): Promise<AppResponse> {
     return buildResponse<ProductWithStock>(200, productWithStock);
   } catch (err) {
     console.error(err);
-    return buildResponse<ErrorResponse>(500, {
-      error: { detail: 'Internal Server Error' },
-    });
+    return buildServerErrorResponse();
   }
 }

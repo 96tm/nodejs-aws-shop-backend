@@ -1,18 +1,19 @@
-import { buildResponse, AppResponse } from '../../../../utils/utils';
-import { ErrorResponse } from '../models/response';
-import { Product } from '../models/product';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { APIGatewayEvent } from 'aws-lambda';
 import {
   DynamoDBDocumentClient,
   ScanCommand,
   ScanCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
+
 import { Stock } from '../models/stock';
 import { ProductWithStock } from '../models/product_with_stock';
-
-interface LambdaEvent {
-  queryStringParameters?: Record<string, string>;
-}
+import {
+  buildResponse,
+  AppResponse,
+  buildServerErrorResponse,
+} from '../../../../utils/utils';
+import { Product } from '../models/product';
 
 interface ProductsScanCommandOutput extends ScanCommandOutput {
   Items?: Product[] | undefined;
@@ -57,11 +58,11 @@ async function getStocks({
   return stocks || [];
 }
 
-export async function handler(event: LambdaEvent): Promise<AppResponse> {
+export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
   console.log(event);
-  const client = new DynamoDBClient({});
-  const dynamo = DynamoDBDocumentClient.from(client);
   try {
+    const client = new DynamoDBClient({});
+    const dynamo = DynamoDBDocumentClient.from(client);
     const products = await getProducts({ documentClient: dynamo });
     const stocks = await getStocks({ documentClient: dynamo });
     const stocksHashMap = stocks.reduce<StocksHashMap>(
@@ -79,8 +80,6 @@ export async function handler(event: LambdaEvent): Promise<AppResponse> {
     return response;
   } catch (err) {
     console.error(err);
-    return buildResponse<ErrorResponse>(500, {
-      error: { detail: 'Internal Server Error' },
-    });
+    return buildServerErrorResponse();
   }
 }
