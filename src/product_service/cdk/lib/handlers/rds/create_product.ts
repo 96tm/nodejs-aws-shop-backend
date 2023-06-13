@@ -74,7 +74,7 @@ export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
       price: Number(price),
       title: title,
       description: description,
-      count: Number(count),
+      count: parseInt(count),
     };
     const response: CreateProductResponse = {
       data: productWithStock,

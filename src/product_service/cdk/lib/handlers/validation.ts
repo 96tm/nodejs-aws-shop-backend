@@ -18,7 +18,7 @@ export function validateCreateProductRequestBody({
   const priceNumber = Number(attributes.price);
   const countNumber = Number(attributes.count);
 
-  if (Number.isNaN(priceNumber) || Number.isNaN(countNumber)) {
+  if (Number.isNaN(priceNumber) || Number.isNaN(countNumber) || !Number.isInteger(countNumber)) {
     throw new BadRequestError(400, 'Wrong parameter types');
   }
   if (priceNumber <= 0) {

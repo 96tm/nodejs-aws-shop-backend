@@ -38,7 +38,7 @@
                "content": {
                   "application/json": {
                      "schema": {
-                        "$ref": "#/components/schemas/CreateProduct"
+                        "$ref": "#/components/schemas/CreateProductData"
                      }
                   }
                },
@@ -155,6 +155,22 @@
                   "title": "Description",
                   "description": "Product description",
                   "type": "string"
+               }
+            }
+         },
+         "CreateProductData": {
+            "type": "object",
+            "properties": {
+               "data": {
+                  "$ref": "#/components/schemas/CreateProductAttributes"
+               }
+            }
+         },
+         "CreateProductAttributes": {
+            "type": "object",
+            "properties": {
+               "attributes": {
+                  "$ref": "#/components/schemas/CreateProduct"
                }
             }
          },
