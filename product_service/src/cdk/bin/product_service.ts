@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 import { ProductServiceStack } from '../lib/product_service_stack';
 

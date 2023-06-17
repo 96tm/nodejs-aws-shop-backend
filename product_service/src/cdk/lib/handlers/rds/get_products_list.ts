@@ -5,7 +5,7 @@ import {
   buildResponse,
   AppResponse,
   buildServerErrorResponse,
-} from '../../../../../utils/utils';
+} from '../../../../utils/utils';
 import { Product } from '../../models/product';
 import { getPgClient } from './utils';
 

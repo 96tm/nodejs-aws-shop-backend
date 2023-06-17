@@ -1,9 +1,9 @@
-import { getKnexClient } from '../../utils/rds_utils';
+import { getKnexClient } from '../src/utils/rds_utils';
 
-import { mockProducts } from '../cdk/lib/mocks/products';
-import { mockStocks } from '../cdk/lib/mocks/stocks';
+import { mockProducts } from '../src/cdk/lib/mocks/products';
+import { mockStocks } from '../src/cdk/lib/mocks/stocks';
 
-import '../../utils/load_env';
+import '../src/utils/load_env';
 
 async function seedProductsTable(): Promise<void> {
   const tableName = 'products';

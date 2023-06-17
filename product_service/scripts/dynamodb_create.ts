@@ -4,7 +4,7 @@ import {
   ResourceInUseException,
 } from '@aws-sdk/client-dynamodb';
 
-import '../../utils/load_env';
+import '../src/utils/load_env';
 
 async function createProductsTable({
   client,

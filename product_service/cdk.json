@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node -P tsconfig.json --prefer-ts-exts src/product_service/cdk/bin/product_service.ts",
+  "app": "npx ts-node -P tsconfig.json --prefer-ts-exts src/cdk/bin/product_service.ts",
   "watch": {
     "include": [
       "**"

@@ -12,7 +12,7 @@ import {
   buildResponse,
   AppResponse,
   buildServerErrorResponse,
-} from '../../../../../utils/utils';
+} from '../../../../utils/utils';
 import { Product } from '../../models/product';
 
 interface ProductsScanCommandOutput extends ScanCommandOutput {

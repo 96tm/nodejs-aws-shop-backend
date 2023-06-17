@@ -3,10 +3,10 @@ import {
   BatchWriteItemCommand,
 } from '@aws-sdk/client-dynamodb';
 
-import { mockProducts } from '../cdk/lib/mocks/products';
-import { mockStocks } from '../cdk/lib/mocks/stocks';
+import { mockProducts } from '../src/cdk/lib/mocks/products';
+import { mockStocks } from '../src/cdk/lib/mocks/stocks';
 
-import '../../utils/load_env';
+import '../src/utils/load_env';
 
 async function seedProductsTable({ client }: { client: DynamoDBClient }) {
   const requestItems = mockProducts.map((item) => ({

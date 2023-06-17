@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-aws-shop-backend",
+  "name": "nodejs-aws-shop-backend-products-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -41,6 +41,7 @@
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.82.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.82.0-alpha.0",
     "@aws-sdk/client-dynamodb": "^3.348.0",
+    "@aws-sdk/client-s3": "^3.354.0",
     "@aws-sdk/lib-dynamodb": "^3.348.0",
     "aws-cdk-lib": "2.82.0",
     "constructs": "^10.0.0",

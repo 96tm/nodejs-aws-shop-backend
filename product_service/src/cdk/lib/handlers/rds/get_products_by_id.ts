@@ -4,7 +4,7 @@ import {
   AppResponse,
   ErrorData,
   buildServerErrorResponse,
-} from '../../../../../utils/utils';
+} from '../../../../utils/utils';
 import { LambdaEventDetail } from '../types';
 import { getPgClient } from './utils';
 

@@ -15,7 +15,7 @@ import {
   AppResponse,
   ErrorData,
   buildServerErrorResponse,
-} from '../../../../../utils/utils';
+} from '../../../../utils/utils';
 
 interface StocksGetItemCommandOutput extends GetItemCommandOutput {
   Item?: StockItemDynamoDb;

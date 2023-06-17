@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import * as productService from './product_service';
 import { DynamoDbConstruct } from './dynamodb';
 
-import '../../../utils/load_env';
+import '../../utils/load_env';
 import { RdsConstruct } from './rds';
 
 export class ProductServiceStack extends cdk.Stack {

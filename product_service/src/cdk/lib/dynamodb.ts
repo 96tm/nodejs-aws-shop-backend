@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 
-import '../../../utils/load_env';
+import '../../utils/load_env';
 
 export class DynamoDbConstruct extends Construct {
   readonly productsTable: dynamodb.Table;

@@ -1,68 +1,58 @@
 import { randomUUID } from 'crypto';
-import {
-  DynamoDBClient,
-  TransactWriteItemsCommand,
-} from '@aws-sdk/client-dynamodb';
-import {
-  DynamoDBDocumentClient,
-  TransactWriteCommandOutput,
-} from '@aws-sdk/lib-dynamodb';
+
 import { APIGatewayEvent } from 'aws-lambda';
 
 import {
   buildResponse,
   AppResponse,
   buildServerErrorResponse,
-} from '../../../../../utils/utils';
+} from '../../../../utils/utils';
 
-import { ProductItemDynamoDb } from '../../models/product_item_dynamodb';
 import { ProductWithStock } from '../../models/product_with_stock';
 import { BadRequestError } from '../../models/errors';
-import { StockItemDynamoDb } from '../../models/stock_item_dynamodb';
 import { CreateProductRequest, CreateProductResponse } from '../types';
 import { parseCreateProductRequestBody } from '../validation';
+import { getPgClient } from './utils';
 
 async function createProduct({
-  documentClient,
   productData,
 }: {
-  documentClient: DynamoDBDocumentClient;
   productData: CreateProductRequest;
-}): Promise<[string, TransactWriteCommandOutput]> {
+}): Promise<string> {
   const tableNameProducts = process.env.APP_PRODUCTS_TABLE_NAME as string;
   const tableNameStocks = process.env.APP_STOCKS_TABLE_NAME as string;
-
+  const client = getPgClient();
   const productId = randomUUID();
   const productAttributes = productData.data.attributes;
-  const productItem: ProductItemDynamoDb = {
-    id: { S: productId },
-    price: { N: productAttributes.price.toString() },
-    title: { S: productAttributes.title },
-    description: { S: productAttributes.description },
-  };
-  const stockItem: StockItemDynamoDb = {
-    product_id: { S: productId },
-    count: { N: productAttributes.count.toString() },
-  };
-  const commandOutput = await documentClient.send(
-    new TransactWriteItemsCommand({
-      TransactItems: [
-        {
-          Put: {
-            TableName: tableNameProducts,
-            Item: productItem,
-          },
-        },
-        {
-          Put: {
-            TableName: tableNameStocks,
-            Item: stockItem,
-          },
-        },
-      ],
-    })
-  );
-  return [productId, commandOutput as TransactWriteCommandOutput];
+  await client.connect();
+  const insertProductQuery = `
+    INSERT INTO ${tableNameProducts}(id, title, description, price)
+    VALUES ($1, $2, $3, $4);
+  `;
+  const insertStockQuery = `
+    INSERT INTO ${tableNameStocks}(product_id, count)
+    VALUES ($1, $2);
+  `;
+  try {
+    await client.query('BEGIN');
+    await client.query(`${insertProductQuery}`, [
+      productId,
+      productAttributes.title,
+      productAttributes.description,
+      productAttributes.price,
+    ]);
+    await client.query(`${insertStockQuery}`, [
+      productId,
+      productAttributes.count,
+    ]);
+    await client.query('COMMIT');
+    return productId;
+  } catch (e) {
+    client.query('ROLLBACK');
+    throw e;
+  } finally {
+    await client.end();
+  }
 }
 
 export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
@@ -74,11 +64,8 @@ export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
         attributes: { count, price, title, description },
       },
     } = body;
-    const client = new DynamoDBClient({});
-    const dynamo = DynamoDBDocumentClient.from(client);
 
-    const [productId, _] = await createProduct({
-      documentClient: dynamo,
+    const productId = await createProduct({
       productData: body,
     });
 
@@ -87,7 +74,7 @@ export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
       price: Number(price),
       title: title,
       description: description,
-      count: Number(count),
+      count: parseInt(count),
     };
     const response: CreateProductResponse = {
       data: productWithStock,

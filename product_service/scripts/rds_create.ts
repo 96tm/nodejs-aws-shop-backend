@@ -1,6 +1,6 @@
-import { getKnexClient } from '../../utils/rds_utils';
+import { getKnexClient } from '../src/utils/rds_utils';
 
-import '../../utils/load_env';
+import '../src/utils/load_env';
 
 async function createDatabase(): Promise<void> {
   try {

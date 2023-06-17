@@ -18,7 +18,7 @@ import {
 } from 'aws-cdk-lib/aws-ec2';
 import { Duration, RemovalPolicy, SecretValue } from 'aws-cdk-lib';
 
-import '../../../utils/load_env';
+import '../../utils/load_env';
 
 export class RdsConstruct extends Construct {
   readonly dbInstance: DatabaseInstance;

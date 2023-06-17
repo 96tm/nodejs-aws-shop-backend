@@ -8,16 +8,12 @@ import {
 } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
 
-import { ProductServiceProps } from './models/product_service_props';
-
 export function initRdsApi({
   lambdaProps,
   construct,
-  props,
 }: {
   lambdaProps: NodejsFunctionProps;
   construct: Construct;
-  props: ProductServiceProps;
 }): void {
   const getProductsListHandler = new NodejsFunction(
     construct,
@@ -50,6 +46,7 @@ export function initRdsApi({
   );
 
   const api = new apiGateway.HttpApi(construct, 'products-api', {
+    description: 'ProductService HTTP API',
     corsPreflight: {
       allowHeaders: ['*'],
       allowOrigins: ['*'],
