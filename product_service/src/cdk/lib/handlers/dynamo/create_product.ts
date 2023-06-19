@@ -96,7 +96,7 @@ export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
   } catch (err) {
     console.error(err);
     if (err instanceof BadRequestError) {
-      return buildResponse(err.statusCode, { error: { detail: err.message } });
+      return buildResponse(400, { error: { detail: err.message } });
     }
     return buildServerErrorResponse();
   }

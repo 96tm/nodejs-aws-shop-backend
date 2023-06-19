@@ -7,25 +7,29 @@ export function validateCreateProductRequestBody({
   bodyObject: CreateProductRequest;
 }): void {
   if (!('data' in bodyObject) || !('attributes' in bodyObject.data)) {
-    throw new BadRequestError(400, 'Wrong body format');
+    throw new BadRequestError('Wrong body format');
   }
   const attributes = bodyObject.data.attributes;
   for (const property of ['price', 'title', 'description', 'count']) {
     if (!(property in attributes)) {
-      throw new BadRequestError(400, `Request must have "${property}" value`);
+      throw new BadRequestError(`Request must have "${property}" value`);
     }
   }
   const priceNumber = Number(attributes.price);
   const countNumber = Number(attributes.count);
 
-  if (Number.isNaN(priceNumber) || Number.isNaN(countNumber) || !Number.isInteger(countNumber)) {
-    throw new BadRequestError(400, 'Wrong parameter types');
+  if (
+    Number.isNaN(priceNumber) ||
+    Number.isNaN(countNumber) ||
+    !Number.isInteger(countNumber)
+  ) {
+    throw new BadRequestError('Wrong parameter types');
   }
   if (priceNumber <= 0) {
-    throw new BadRequestError(400, '"price" must a positive number');
+    throw new BadRequestError('"price" must a positive number');
   }
   if (countNumber <= 0) {
-    throw new BadRequestError(400, '"count" must a non-negative number');
+    throw new BadRequestError('"count" must a non-negative number');
   }
   const MAX_DESCRIPTION_LENGTH = 1024;
   const MAX_TITLE_LENGTH = 128;
@@ -36,7 +40,6 @@ export function validateCreateProductRequestBody({
   for (const { name, maxLength } of stringProps) {
     if (!attributes[name] || attributes[name].length > maxLength) {
       throw new BadRequestError(
-        400,
         `"${name}" must not be empty or longer than ${maxLength} symbol(s)`
       );
     }
@@ -49,7 +52,7 @@ export function parseCreateProductRequestBody({
   body: string | null;
 }): CreateProductRequest {
   if (body === null) {
-    throw new BadRequestError(400, 'Empty body');
+    throw new BadRequestError('Empty body');
   }
   const bodyObject: CreateProductRequest = JSON.parse(body);
   validateCreateProductRequestBody({ bodyObject });

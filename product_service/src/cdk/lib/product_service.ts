@@ -1,4 +1,3 @@
-import { OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
 import { ProductServiceProps } from './models/product_service_props';
 
