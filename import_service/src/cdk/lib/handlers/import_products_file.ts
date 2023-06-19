@@ -1,7 +1,6 @@
 import {
   APIGatewayEvent,
   APIGatewayProxyEventQueryStringParameters,
-  Context,
 } from 'aws-lambda';
 import { S3 } from '@aws-sdk/client-s3';
 import { S3RequestPresigner } from '@aws-sdk/s3-request-presigner';
@@ -9,6 +8,7 @@ import { HttpRequest } from '@aws-sdk/protocol-http';
 
 import { parseUrl } from '@aws-sdk/url-parser';
 import { formatUrl } from '@aws-sdk/util-format-url';
+import { Duration } from 'aws-cdk-lib';
 
 import {
   AppResponse,
@@ -20,10 +20,9 @@ import { BadRequestError } from '../models/errors';
 async function createUrl(name: string): Promise<string> {
   const region = process.env.PRODUCT_AWS_REGION;
   const bucketName = process.env.IMPORT_BUCKET_NAME as string;
-  const bucketArn = process.env.IMPORT_BUCKET_NAME as string;
-
+  const directoryName = process.env.IMPORT_BUCKET_UPLOAD_DIR as string;
   const url = parseUrl(
-    `https://${bucketName}.s3.${region}.amazonaws.com/uploaded/${name}`
+    `https://${bucketName}.s3.${region}.amazonaws.com/${directoryName}/${name}`
   );
   const client = new S3({});
   const presigner = new S3RequestPresigner({
@@ -31,7 +30,12 @@ async function createUrl(name: string): Promise<string> {
   });
 
   const signedUrlObject = await presigner.presign(
-    new HttpRequest({ ...url, method: 'PUT' })
+    new HttpRequest({
+      ...url,
+      method: 'PUT',
+      headers: { 'Content-Type': 'text/csv' },
+    }),
+    { expiresIn: Duration.minutes(5).toSeconds() }
   );
 
   return formatUrl(signedUrlObject);
@@ -44,8 +48,7 @@ interface ImportProductsFileEvent extends APIGatewayEvent {
 }
 
 export async function handler(
-  event: ImportProductsFileEvent,
-  context: Context
+  event: ImportProductsFileEvent
 ): Promise<AppResponse> {
   console.log(event);
   try {

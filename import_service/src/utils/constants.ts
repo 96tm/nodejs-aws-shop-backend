@@ -12,3 +12,6 @@ export const SHARED_LAMBDA_PROPS: Partial<NodejsFunctionProps> = {
     PRODUCT_AWS_REGION: process.env.PRODUCT_AWS_REGION,
   },
 };
+
+export const IMPORT_BUCKET_PARSED_DIR = 'parsed';
+export const IMPORT_BUCKET_UPLOAD_DIR = 'uploaded';
