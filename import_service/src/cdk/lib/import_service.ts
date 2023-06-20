@@ -18,6 +18,13 @@ export class ImportService extends Construct {
 
     const bucket = new s3.Bucket(this, 'ImportBucket', {
       bucketName: 'rs-aws-import-products-bucket',
+      cors: [
+        {
+          allowedHeaders: ['*'],
+          allowedOrigins: ['*'],
+          allowedMethods: [s3.HttpMethods.GET, s3.HttpMethods.PUT],
+        },
+      ],
     });
 
     const lambdaProps = {
