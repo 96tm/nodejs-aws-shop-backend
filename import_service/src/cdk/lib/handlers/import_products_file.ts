@@ -37,7 +37,6 @@ async function createUrl(name: string): Promise<string> {
     }),
     { expiresIn: Duration.minutes(5).toSeconds() }
   );
-
   return formatUrl(signedUrlObject);
 }
 
