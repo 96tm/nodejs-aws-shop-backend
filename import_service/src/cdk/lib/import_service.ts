@@ -11,6 +11,9 @@ import {
   IMPORT_BUCKET_PARSED_DIR,
 } from '../../utils/constants';
 import { aws_s3_notifications } from 'aws-cdk-lib';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as sns from 'aws-cdk-lib/aws-sns';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 export class ImportService extends Construct {
   constructor(scope: Construct, id: string) {
@@ -61,6 +64,55 @@ export class ImportService extends Construct {
     bucket.grantReadWrite(importProductsFileHandler);
     bucket.grantReadWrite(importFileParserHandler);
     bucket.grantDelete(importFileParserHandler);
+
+    const importProductsTopic = new sns.Topic(this, 'ImportProductsTopic', {
+      topicName: 'import-products-topic',
+    });
+
+    const importQueue = new sqs.Queue(this, 'ImportQueue', {
+      queueName: 'import-queue',
+    });
+
+    new sns.Subscription(this, 'BigStockSubscription', {
+      endpoint: process.env.BIG_STOCK_EMAIL,
+      protocol: sns.SubscriptionProtocol.EMAIL,
+      topic: importProductsTopic,
+      filterPolicy: {
+        count: sns.SubscriptionFilter.numericFilter({
+          greaterThanOrEqualTo: parseInt(process.env.MAX_REGULAR_PRODUCT_COUNT),
+        }),
+      },
+    });
+
+    new sns.Subscription(this, 'RegularStockSubscription', {
+      endpoint: process.env.REGULAR_STOCK_EMAIL,
+      protocol: sns.SubscriptionProtocol.EMAIL,
+      topic: importProductsTopic,
+      filterPolicy: {
+        count: sns.SubscriptionFilter.numericFilter({
+          lessThan: parseInt(process.env.MAX_REGULAR_PRODUCT_COUNT),
+        }),
+      },
+    });
+
+    const catalogBatchProcessHandler = new NodejsFunction(
+      this,
+      'CatalogBatchProcessLambda',
+      {
+        ...lambdaProps,
+        environment: {
+          ...lambdaProps.environment,
+          IMPORT_PRODUCTS_TOPIC_ARN: importProductsTopic.topicArn,
+        },
+        functionName: 'catalogBatchProcess',
+        entry: path.resolve(__dirname, 'handlers/catalog_batch_process.ts'),
+      }
+    );
+
+    importProductsTopic.grantPublish(catalogBatchProcessHandler);
+    catalogBatchProcessHandler.addEventSource(
+      new SqsEventSource(importQueue, { batchSize: 5 })
+    );
 
     const api = new apiGateway.HttpApi(this, 'import-api', {
       description: 'ImportService HTTP API',
