@@ -8,6 +8,10 @@ declare global {
       POSTGRES_USER: string;
       POSTGRES_PASSWORD: string;
       POSTGRES_HOST: string;
+
+      REGULAR_STOCK_EMAIL: string;
+      BIG_STOCK_EMAIL: string;
+      MAX_REGULAR_PRODUCT_COUNT: string;
     }
   }
 }

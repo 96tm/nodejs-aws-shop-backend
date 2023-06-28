@@ -1,22 +1,20 @@
+import { randomUUID } from 'crypto';
+
 import { APIGatewayEvent } from 'aws-lambda';
 
 import {
-  AppResponse,
   buildResponse,
+  AppResponse,
   buildServerErrorResponse,
-} from '../../../utils/utils';
-import { BadRequestError } from '../models/errors';
+} from '../../../../utils/utils';
 
 export async function handler(event: APIGatewayEvent): Promise<AppResponse> {
   try {
     console.log(event);
 
-    return buildResponse<{}>(200, {});
+    return buildResponse<{}>(201, {});
   } catch (err) {
     console.error(err);
-    if (err instanceof BadRequestError) {
-      return buildResponse(400, { error: { detail: err.message } });
-    }
     return buildServerErrorResponse();
   }
 }
