@@ -6,10 +6,17 @@ import {
   DeleteObjectCommand,
   CopyObjectCommand,
 } from '@aws-sdk/client-s3';
+import {
+  MessageAttributeValue,
+  SQSClient,
+  SendMessageCommand,
+} from '@aws-sdk/client-sqs';
 import csvParser from 'csv-parser';
 
 import { Transform, pipeline } from 'stream';
 import { promisify } from 'util';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 
 import {
   AppResponse,
@@ -17,8 +24,10 @@ import {
   buildServerErrorResponse,
 } from '../../../utils/utils';
 import { BadRequestError } from '../models/errors';
+import { CreateProductRequestAttributes } from '../models/product';
 
 const client = new S3Client({});
+const sqsClient = new SQSClient({});
 
 async function parseFile(bucket: string, key: string): Promise<void> {
   const params = {
@@ -39,13 +48,26 @@ async function parseFile(bucket: string, key: string): Promise<void> {
     csvParser(),
     new Transform({
       objectMode: true,
-      transform: (data, _, done) => {
-        console.log(data);
+      transform: async (data, _, done) => {
+        await sendDataToQueue({ data });
         done(null, data);
       },
     })
   );
   await streamPromise;
+}
+
+async function sendDataToQueue({
+  data,
+}: {
+  data: CreateProductRequestAttributes;
+}) {
+  const command = new SendMessageCommand({
+    QueueUrl: process.env.IMPORT_SQS_URL,
+    MessageGroupId: process.env.IMPORT_QUEUE_MESSAGE_GROUP_ID,
+    MessageBody: JSON.stringify(data),
+  });
+  return sqsClient.send(command);
 }
 
 async function moveToParsed(

@@ -8,10 +8,10 @@
     "cdk:deploy": "npx cdk deploy",
     "test": "jest",
     "prettier": "prettier src/* --write",
-    "dynamodb:create": "ts-node ./src/product_service/scripts/dynamodb_create.ts",
-    "rds:create": "ts-node ./src/product_service/scripts/rds_create.ts",
-    "rds:seed": "ts-node ./src/product_service/scripts/rds_seed.ts",
-    "dynamodb:seed": "ts-node ./src/product_service/scripts/dynamodb_seed.ts"
+    "dynamodb:create": "ts-node ./scripts/dynamodb_create.ts",
+    "rds:create": "ts-node ./scripts/rds_create.ts",
+    "rds:seed": "ts-node ./scripts/rds_seed.ts",
+    "dynamodb:seed": "ts-node ./scripts/dynamodb_seed.ts"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,8 @@
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.82.0-alpha.0",
     "@aws-sdk/client-dynamodb": "^3.348.0",
     "@aws-sdk/client-s3": "^3.354.0",
+    "@aws-sdk/client-sns": "^3.360.0",
+    "@aws-sdk/client-sqs": "^3.360.0",
     "@aws-sdk/lib-dynamodb": "^3.348.0",
     "aws-cdk-lib": "2.82.0",
     "constructs": "^10.0.0",
