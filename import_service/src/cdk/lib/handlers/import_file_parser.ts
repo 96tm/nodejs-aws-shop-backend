@@ -6,17 +6,11 @@ import {
   DeleteObjectCommand,
   CopyObjectCommand,
 } from '@aws-sdk/client-s3';
-import {
-  MessageAttributeValue,
-  SQSClient,
-  SendMessageCommand,
-} from '@aws-sdk/client-sqs';
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import csvParser from 'csv-parser';
 
 import { Transform, pipeline } from 'stream';
 import { promisify } from 'util';
-import * as sqs from 'aws-cdk-lib/aws-sqs';
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 
 import {
   AppResponse,
@@ -64,7 +58,6 @@ async function sendDataToQueue({
 }) {
   const command = new SendMessageCommand({
     QueueUrl: process.env.IMPORT_SQS_URL,
-    MessageGroupId: process.env.IMPORT_QUEUE_MESSAGE_GROUP_ID,
     MessageBody: JSON.stringify(data),
   });
   return sqsClient.send(command);

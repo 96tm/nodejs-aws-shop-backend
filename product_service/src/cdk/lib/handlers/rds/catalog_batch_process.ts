@@ -1,5 +1,5 @@
 import { SQSEvent } from 'aws-lambda';
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
 
 import {
   buildResponse,
@@ -10,6 +10,7 @@ import { createProduct } from './utils';
 import { CreateProductRequest, CreateProductRequestAttributes } from '../types';
 import { validateCreateProductRequestBody } from '../validation';
 import { CatalogBatchProcessItemResult } from './types';
+import { BadRequestError } from '../../models/errors';
 
 const snsClient = new SNSClient({});
 
@@ -48,6 +49,9 @@ export async function handler(event: SQSEvent): Promise<AppResponse> {
     return buildResponse<CatalogBatchProcessItemResult[]>(201, results);
   } catch (err) {
     console.error(err);
+    if (err instanceof BadRequestError) {
+      return buildResponse(400, { error: { detail: err.message } });
+    }
     return buildServerErrorResponse();
   }
 }

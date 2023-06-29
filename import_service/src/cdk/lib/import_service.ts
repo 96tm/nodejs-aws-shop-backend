@@ -43,8 +43,6 @@ export class ImportService extends Construct {
         IMPORT_BUCKET_UPLOAD_DIR,
         IMPORT_BUCKET_PARSED_DIR,
         IMPORT_SQS_URL: queue.queueUrl,
-        IMPORT_QUEUE_MESSAGE_GROUP_ID:
-          process.env.IMPORT_QUEUE_MESSAGE_GROUP_ID,
       },
     };
 

@@ -53,9 +53,7 @@ export class ProductService extends Construct {
     });
 
     const catalogItemsQueue = new sqs.Queue(this, 'CatalogItemsQueue', {
-      queueName: 'catalog-items-queue.fifo',
-      fifo: true,
-      contentBasedDeduplication: true,
+      queueName: 'catalog-items-queue',
     });
 
     new sns.Subscription(this, 'BigStockSubscription', {
