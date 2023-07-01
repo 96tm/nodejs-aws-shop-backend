@@ -1,5 +1,5 @@
 import { BadRequestError } from '../models/errors';
-import { CreateProductRequest } from './types';
+import { CreateProductRequest, CreateProductRequestAttributes } from './types';
 
 export function validateCreateProductRequestBody({
   bodyObject,
@@ -10,6 +10,14 @@ export function validateCreateProductRequestBody({
     throw new BadRequestError('Wrong body format');
   }
   const attributes = bodyObject.data.attributes;
+  validateCreateRequestDataAttributes({ attributes });
+}
+
+export function validateCreateRequestDataAttributes({
+  attributes,
+}: {
+  attributes: CreateProductRequestAttributes;
+}): void {
   for (const property of ['price', 'title', 'description', 'count']) {
     if (!(property in attributes)) {
       throw new BadRequestError(`Request must have "${property}" value`);

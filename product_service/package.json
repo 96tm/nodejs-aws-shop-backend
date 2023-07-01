@@ -8,10 +8,10 @@
     "cdk:deploy": "npx cdk deploy",
     "test": "jest",
     "prettier": "prettier src/* --write",
-    "dynamodb:create": "ts-node ./src/product_service/scripts/dynamodb_create.ts",
-    "rds:create": "ts-node ./src/product_service/scripts/rds_create.ts",
-    "rds:seed": "ts-node ./src/product_service/scripts/rds_seed.ts",
-    "dynamodb:seed": "ts-node ./src/product_service/scripts/dynamodb_seed.ts"
+    "dynamodb:create": "ts-node ./scripts/dynamodb_create.ts",
+    "rds:create": "ts-node ./scripts/rds_create.ts",
+    "rds:seed": "ts-node ./scripts/rds_seed.ts",
+    "dynamodb:seed": "ts-node ./scripts/dynamodb_seed.ts"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/96tm/nodejs-aws-shop-backend#readme",
   "devDependencies": {
+    "@aws-sdk/types": "^3.357.0",
     "@types/aws-lambda": "^8.10.117",
     "@types/dotenv": "^8.2.0",
     "@types/jest": "^29.5.1",
@@ -42,8 +43,12 @@
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.82.0-alpha.0",
     "@aws-sdk/client-dynamodb": "^3.348.0",
     "@aws-sdk/client-s3": "^3.354.0",
+    "@aws-sdk/client-sns": "^3.360.0",
+    "@aws-sdk/client-sqs": "^3.360.0",
     "@aws-sdk/lib-dynamodb": "^3.348.0",
     "aws-cdk-lib": "2.82.0",
+    "aws-sdk-client-mock": "^2.2.0",
+    "aws-sdk-mock": "^5.8.0",
     "constructs": "^10.0.0",
     "dotenv": "^16.1.3",
     "knex": "^2.4.2",

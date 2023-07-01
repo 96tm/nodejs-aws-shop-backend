@@ -4,13 +4,14 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as apiGateway from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import { aws_s3_notifications } from 'aws-cdk-lib';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 import {
   SHARED_LAMBDA_PROPS,
   IMPORT_BUCKET_UPLOAD_DIR,
   IMPORT_BUCKET_PARSED_DIR,
 } from '../../utils/constants';
-import { aws_s3_notifications } from 'aws-cdk-lib';
 
 export class ImportService extends Construct {
   constructor(scope: Construct, id: string) {
@@ -27,6 +28,12 @@ export class ImportService extends Construct {
       ],
     });
 
+    const queue = sqs.Queue.fromQueueArn(
+      this,
+      'ImportFileQueue',
+      process.env.IMPORT_QUEUE_ARN
+    );
+
     const lambdaProps = {
       ...SHARED_LAMBDA_PROPS,
       environment: {
@@ -35,6 +42,7 @@ export class ImportService extends Construct {
         IMPORT_BUCKET_ARN: bucket.bucketArn,
         IMPORT_BUCKET_UPLOAD_DIR,
         IMPORT_BUCKET_PARSED_DIR,
+        IMPORT_SQS_URL: queue.queueUrl,
       },
     };
 
@@ -57,7 +65,7 @@ export class ImportService extends Construct {
         entry: path.resolve(__dirname, 'handlers/import_file_parser.ts'),
       }
     );
-
+    queue.grantSendMessages(importFileParserHandler);
     bucket.grantReadWrite(importProductsFileHandler);
     bucket.grantReadWrite(importFileParserHandler);
     bucket.grantDelete(importFileParserHandler);
