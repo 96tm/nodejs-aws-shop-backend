@@ -4,6 +4,10 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as apiGateway from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import {
+  HttpLambdaAuthorizer,
+  HttpLambdaResponseType,
+} from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
 import { aws_s3_notifications } from 'aws-cdk-lib';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -78,6 +82,20 @@ export class ImportService extends Construct {
         allowMethods: [apiGateway.CorsHttpMethod.ANY],
       },
     });
+
+    const basicAuthorizerLambda = NodejsFunction.fromFunctionArn(
+      this,
+      'BasicAuthorizerLambda',
+      process.env.BASIC_AUTHORIZER_LAMBDA_ARN
+    );
+    const basicAuthorizer = new HttpLambdaAuthorizer(
+      'BasicHttpApiAuthorizer',
+      basicAuthorizerLambda,
+      {
+        responseTypes: [HttpLambdaResponseType.SIMPLE],
+      }
+    );
+
     api.addRoutes({
       integration: new HttpLambdaIntegration(
         'ImportProductsFileIntegration',
@@ -85,6 +103,7 @@ export class ImportService extends Construct {
       ),
       path: '/import',
       methods: [apiGateway.HttpMethod.GET],
+      authorizer: basicAuthorizer,
     });
 
     bucket.addEventNotification(

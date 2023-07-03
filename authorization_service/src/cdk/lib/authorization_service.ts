@@ -3,25 +3,30 @@ import { Construct } from 'constructs';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 
 import { SHARED_LAMBDA_PROPS } from '../../utils/constants';
+import { ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class AuthorizationService extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    new NodejsFunction(
+    const lambdaProps = {
+      ...SHARED_LAMBDA_PROPS,
+      environment: {
+        ...SHARED_LAMBDA_PROPS.environment,
+        AUTH_USER: process.env.AUTH_USER,
+        AUTH_PASSWORD: process.env.AUTH_PASSWORD,
+      },
+    };
+    const basicAuthorizerLambda = new NodejsFunction(
       this,
       'BasicAuthorizerLambda',
       {
-        ...SHARED_LAMBDA_PROPS,
+        ...lambdaProps,
         functionName: 'basicAuthorizer',
         entry: path.resolve(__dirname, 'handlers/basic_authorizer.ts'),
       }
     );
-    // const importedLambdaFromArn = lambda.Function.fromFunctionArn(
-    //   this,
-    //   'external-lambda-from-arn',
-    //   `arn:aws:lambda:${cdk.Stack.of(this).region}:${
-    //     cdk.Stack.of(this).account
-    //   }:function:YOUR_FUNCTION_NAME`,
-    // );
+    basicAuthorizerLambda.grantInvoke(
+      new ServicePrincipal('apigateway.amazonaws.com')
+    );
   }
 }
