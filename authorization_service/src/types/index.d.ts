@@ -3,8 +3,8 @@ declare global {
     interface ProcessEnv {
       NODE_ENV: 'development' | 'production';
       PRODUCT_AWS_REGION: string;
-      IMPORT_QUEUE_ARN: string;
-      BASIC_AUTHORIZER_LAMBDA_ARN: string;
+      AUTH_USER: string;
+      AUTH_PASSWORD: string;
     }
   }
 }
