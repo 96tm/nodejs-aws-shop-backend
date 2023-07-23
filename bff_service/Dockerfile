@@ -16,7 +16,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 USER node
 COPY --from=builder --chown=node:node /app/dist ./dist
-RUN ls /app
 COPY --chown=node:node . /app
 EXPOSE ${app_port}
 CMD ["node", "./dist/index.js"]
