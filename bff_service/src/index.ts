@@ -1,5 +1,5 @@
 import express, { Application, Request, Response } from 'express';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
 import './utils/load_env';
@@ -23,15 +23,21 @@ app.use('/*', async (req: Request, res: Response): Promise<void> => {
   }
   const recipientUrl = RECIPIENTS[serviceName];
   const requestPath = `${originalUrl.split('/').slice(2).join('/')}`;
-  const cachedResponse = responseCache.get(serviceName, requestPath);
+  const cachedResponse = responseCache.get(
+    serviceName,
+    `${method}_${requestPath}`
+  );
   if (cachedResponse) {
     res.status(cachedResponse.status).json(cachedResponse.json);
     return;
   }
-  const requestConfig = {
+
+  const requestHeaders = headers.authorization
+    ? { headers: { authorization: headers.authorization } }
+    : {};
+  const requestConfig: AxiosRequestConfig = {
     method,
-    body,
-    headers,
+    ...requestHeaders,
     url: `${recipientUrl}/${requestPath}`,
     ...(Object.keys(body || {}).length > 0 && { data: body }),
   };
