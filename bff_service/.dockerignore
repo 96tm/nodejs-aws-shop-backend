@@ -1,0 +1,12 @@
+dist
+cdk.out
+README.md
+.env.*
+**/.dockerignore
+**/.git
+**/.gitignore
+**/.vscode
+**/Dockerfile*
+**/node_modules
+**/npm-debug.log
+.elasticbeanstalk/*
